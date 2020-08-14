@@ -8,4 +8,4 @@ RUN mkdir /app
 COPY ./covid_dashboard.py /app
 COPY ./wsgi.py /app
 WORKDIR /app
-CMD gunicorn --bind 0.0.0.0:80 wsgi
+CMD gunicorn --bind 0.0.0.0:8080 wsgi
