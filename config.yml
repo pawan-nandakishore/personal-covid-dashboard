@@ -1,0 +1,15 @@
+'overall_loc': 'data/overall.csv'
+'historic_loc': 'data/historic.csv'
+'jh_timeseries_cases': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv'
+'jh_timeseries_deaths': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv'
+'plotly_geojson_counties': 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
+'counties_data': 'data/counties_cases_data.csv'
+'state_centers': 'data/states_centers.csv'
+'jh_counties_cases': 'data/jh_counties_cases.csv'
+'jh_counties_deaths': 'data/jh_counties_deaths.csv'
+'plot_color': "#09051F"
+'paper_color': "#09051F"
+'bar_color': "#D64D44"
+'marker_line_color': 'black'
+'bg_color': '#16051F'
+
