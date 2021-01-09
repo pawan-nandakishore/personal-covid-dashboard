@@ -7,9 +7,9 @@
 'state_centers': 'data/states_centers.csv'
 'jh_counties_cases': 'data/jh_counties_cases.csv'
 'jh_counties_deaths': 'data/jh_counties_deaths.csv'
-'plot_color': "#09051F"
+'plot_color': "white"
 'paper_color': "#09051F"
-'bar_color': "#3BE7FF"
-'marker_line_color': 'black'
+'bar_color': "#50A2FF"
+'marker_line_color': 'grey'
 'bg_color': '#16051F'
 
