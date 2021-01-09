@@ -5,8 +5,9 @@ RUN apt-get install -y python3 python3-dev python3-pip
 COPY ./requirements.txt requirements.txt
 RUN pip3 install --upgrade pip setuptools
 RUN apt-get install git -y 
+EXPOSE 8050
 RUN pip3 install -r requirements.txt
 RUN mkdir /app
 COPY . /app
 WORKDIR /app
-CMD gunicorn --bind 0.0.0.0:8050  --workers=5 --access-logfile logs.txt index:server 
+CMD gunicorn --bind 0.0.0.0:8080 --workers=5 wsgi
