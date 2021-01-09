@@ -40,51 +40,40 @@ def update_summary_metrics(n):
 
     # Number of new cases and display msg
     positive_increase = overall_us_df['positive'].iloc[0]-overall_us_df['positive'].iloc[1]
-    arrow_direction =  "\u25B2" if positive_increase > 0 else "\u25BC"
+    arrow_direction =  "\u25B2" #if positive_increase > 0 else "\u25BC"
     pos_increase_msg = "({} {:,})".format( arrow_direction, int(positive_increase))
   
     # Number of deaths increase count and display msg
     death_increase = overall_us_df['death'].iloc[0] -overall_us_df['death'].iloc[1]
-    arrow_direction =  "\u25B2" if death_increase > 0 else "\u25BC"
+    arrow_direction =  "\u25B2" #if death_increase > 0 else "\u25BC"
     death_increase_msg = "({} {:,})".format( arrow_direction, int(death_increase))
   
     # Get total number of new tested people count and display msg
     tested_increase = overall_us_df['totalTestResults'].iloc[0] -overall_us_df['totalTestResults'].iloc[1]
-    arrow_direction =  "\u25B2" if tested_increase> 0 else "\u25BC"
+    arrow_direction =  "\u25B2" #if tested_increase> 0 else "\u25BC"
     tested_increase_msg = "({} {:,})".format( arrow_direction, int(tested_increase))
   
     # Get hosp increase count and display msg
     hospitalized_increase = overall_us_df['hospitalized'].iloc[0] -overall_us_df['hospitalized'].iloc[1]
-    arrow_direction =  "\u25B2" if hospitalized_increase > 0 else "\u25BC"
+    arrow_direction =  "\u25B2" #if hospitalized_increase > 0 else "\u25BC"
     hospitalized_increase_msg = "({} {:,})".format( arrow_direction, int(hospitalized_increase))
   
     # Positive total and increase divs
     cases_div = html.H4([total_cases])
-    if positive_increase> 0:
-        cases_increase_div =  html.Div([html.H5(pos_increase_msg)], style={'color': 'red'})  
-    else: 
-        cases_increase_div =  html.Div([html.H5(pos_increase_msg)], style={'color': 'green'})
+    cases_increase_div =  html.Div([html.H5(pos_increase_msg)], style={'color': 'red'})  
+   
 
     # Deaths total and increase div
     deaths_div = html.H4([total_deaths])
-    if death_increase > 0: 
-         death_increase_div = html.Div(html.H5(death_increase_msg), style={'color': 'red'})
-    else: 
-         death_increase_div = html.Div(html.H5(death_increase_msg),  style={'color': 'darkgreen'})
+    death_increase_div = html.Div(html.H5(death_increase_msg), style={'color': 'red'})
     
     # Tested total and increase divs
     tested_div = html.H4([total_tested])
-    if tested_increase > 0: 
-         tested_increase_div = html.Div(html.H5(tested_increase_msg), style={'color': 'red'})
-    else: 
-         tested_increase_div = html.Div(html.H5(tested_increase_msg),  style={'color': 'darkgreen'})
+    tested_increase_div = html.Div(html.H5(tested_increase_msg), style={'color': 'darkgreen'})
     
     # Hospitalized totals and increase divs
     hosp_div = html.H4([total_hospitalized])
-    if death_increase > 0: 
-         hosp_increase_div = html.Div(html.H5(hospitalized_increase_msg), style={'color': 'red'})
-    else: 
-         hosp_increase_div = html.Div(html.H5(hospitalized_increase_msg),  style={'color': 'darkgreen'})
+    hosp_increase_div = html.Div(html.H5(hospitalized_increase_msg), style={'color': 'red'})
     
     return  [cases_div, cases_increase_div,  deaths_div, death_increase_div,  tested_div, tested_increase_div,  hosp_div, hosp_increase_div]
 

@@ -72,7 +72,7 @@ covid_layout = html.Div([
     html.Div([
               dcc.Interval(
                     id='get_data',
-                    interval=500*1000, # in milliseconds
+                    interval=5000*1000, # in milliseconds
                     n_intervals=0
                     ),
             html.H3(id='show-data') ],

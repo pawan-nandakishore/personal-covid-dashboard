@@ -1,10 +1,15 @@
+Cython
+fiona
+shapely
 pandas
+pyproj
+geopandas
 dash==1.14.0
 us
 flask
 plotly==4.9.0
 gunicorn
 datetime
-yaml 
-dash_bootstrap_components
+pyyaml 
+dash-bootstrap-components
 plotly-express
