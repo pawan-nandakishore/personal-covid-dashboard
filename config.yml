@@ -9,7 +9,7 @@
 'jh_counties_deaths': 'data/jh_counties_deaths.csv'
 'plot_color': "#09051F"
 'paper_color': "#09051F"
-'bar_color': "#D64D44"
+'bar_color': "#3BE7FF"
 'marker_line_color': 'black'
 'bg_color': '#16051F'
 
