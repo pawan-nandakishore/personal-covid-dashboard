@@ -39,7 +39,7 @@ def footer_text():
 
 
 def page2_below_title(): 
-    return html.H5("""Get a state and county wise breakdown of COVID-19 cases. Hover over the map below to see the names of the state and see cumulative values of each metric. You can switch between three metrics below. """)
+    return html.H5("""Get a state and county wise breakdown of COVID-19 cases. Hover over the map below to see the names of the state and see cumulative values of each metric. You can switch between three metrics below.""")
 
 
 def daily_data(): 

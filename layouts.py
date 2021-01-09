@@ -261,6 +261,8 @@ covid_layout_2  = html.Div([
     # US map choropleth 
     html.Div([html.H4("Hover on each state to see cumulative number of infections, deaths or people tested")], 
                          style={'display': 'block', 'width': '50%', 'margin-left': '10%','margin-right': 'auto'}),
+    
+   
     html.Div([dcc.Graph(id="main-choro")],
                         style={'width': '90%',
                                 'display': 'inline'}, 
@@ -271,11 +273,17 @@ covid_layout_2  = html.Div([
     # Small plot 2 
     html.Div([dcc.Graph(id="pl4" )], className="six columns plot"),  
     ], className="state-row"),
+    html.Div([html.H4("Click on a state get a county level map")], 
+                         style={'display': 'block', 'width': '50%', 'margin-left': '10%','margin-right': 'auto'}),
+
     html.Div([dcc.Graph(id="state-choro", figure=ut.counties_textbox())],
                         style={'width': '90%',
                                 'display': 'inline'}, 
                                 className="six columns plot colorbar-plot"),
-   
+    
+    html.Div([html.H4("Click on a county to get plots about number of infections and deaths per day ")], 
+                         style={'display': 'block', 'width': '50%', 'margin-left': '10%','margin-right': 'auto'}),
+
     html.Div([
         html.Div([dcc.Graph(id='county-cases', 
                             figure=ut.counties_cases_textbox())],
@@ -286,6 +294,12 @@ covid_layout_2  = html.Div([
 
     ], className='county-plots-row')
 ])
+
+
+
+################ PAGE 3 LAYOUT ################ 
+
+
 
 covid_layout_3  = html.Div([
     html.Br(),     
