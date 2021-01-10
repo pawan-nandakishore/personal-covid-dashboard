@@ -11,9 +11,32 @@ import dash_core_components as dcc
 import plotly.express as px
 import datetime
 import dash_html_components as html
+import dash_bootstrap_components as dbc
+
 
 with open("config.yml",'r') as f: 
     config = yaml.load(f,  Loader=yaml.FullLoader)
+
+tabs_styles = {
+    'height': '44px'
+}
+tab_style = {
+    # 'borderBottom': '1px solid #d6d6d6',
+    'padding': '6px',
+    'fontWeight': 'bold',
+    'border-radius':'25px',
+     'color': 'black'
+    
+}
+
+tab_selected_style = {
+    'borderTop': '1px solid #d6d6d6',
+    'borderBottom': '1px solid #d6d6d6',
+    'backgroundColor': '#119DFF',
+    'border-radius':'25px',
+    'color': 'blue',
+    'padding': '6px'
+}
 
 
 def below_title(): 
@@ -265,13 +288,13 @@ def county_cases_deaths(county_name, state_name, cases=True):
     state_name = str(us.states.lookup(state_name))
     
     counties_cases = pd.read_csv(config['jh_counties_deaths'])
-    
     if cases == True: 
         counties_cases = pd.read_csv(config['jh_counties_cases'])
     
     _, indx_list = get_timecols_v2(counties_cases)
     single_county_total = counties_cases[(counties_cases['Admin2'] == county_name) & (counties_cases['Province_State'] == state_name )].iloc[0,indx_list]
     county_cum_cases = single_county_total.to_frame()
+    
     county_cum_cases.columns = ['cases']
     
     # New cases per day 
@@ -279,6 +302,8 @@ def county_cases_deaths(county_name, state_name, cases=True):
     county_day_cases = county_day_cases.fillna(0) 
     county_day_cases[county_day_cases < 0 ] = 0
     county_day_cases = county_day_cases.to_frame()
+    county_day_cases['dates_dt']= county_day_cases.index
+    county_day_cases['dates_dt'] = pd.to_datetime(county_day_cases['dates_dt'], format='%y-%m-%d')
     return county_cum_cases, county_day_cases
 
 def plot_county_data(df, county_name, state_name, cases=True, cumulative=False ):
@@ -307,8 +332,8 @@ def plot_county_data(df, county_name, state_name, cases=True, cumulative=False )
                            )
     county_fig.update_yaxes(autorange=True, fixedrange=False)
     county_fig.update_xaxes(nticks=20)
-    county_fig.update_layout(dict(paper_bgcolor="#09051F",
-                                         plot_bgcolor="#09051F",
+    county_fig.update_layout(dict(paper_bgcolor=config['paper_color'],
+                                         plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
     county_fig.update_traces(marker_color=config['bar_color'],  marker_line_color=config['marker_line_color'])                            
     county_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
@@ -390,3 +415,158 @@ def counties_deaths_textbox():
     mock_plot.update_xaxes(nticks=20, showgrid=False, visible=False,  showticklabels=False, zeroline= False)
     mock_plot.update_yaxes(showgrid=False, showticklabels=False, visible=False, zeroline= False)
     return mock_plot
+
+
+
+
+
+def date_filter(df, range_choice): 
+    """
+        Filter the input data in df by date choice. Date choice
+        options are: week, month, three_months, six_months, all_time
+
+    :param df: Entire dataset with all columns
+    :type df: DataFrame
+    :param range_choice: User selected date range choice
+    :type range_choice: string
+    :return: Return a filtered dataframe based on range_choice
+    :rtype: DataFrame
+    """
+    # filter by date range
+    # filter by week 
+    dt_upper = df['dates_dt'].max()
+    if range_choice == "week":   
+        
+        dt_lower  = dt_upper - datetime.timedelta(days=7)
+        overall_range = df[(df['dates_dt']>= dt_lower) & (df['dates_dt']<= dt_upper)]
+
+    elif range_choice == "month":
+    # filter by last month
+        dt_lower  = dt_upper - datetime.timedelta(weeks=4)
+        overall_range = df[(df['dates_dt']>= dt_lower) & (df['dates_dt']<= dt_upper)]
+
+    elif range_choice == "three_months":
+    # Last three months
+        three_months = pd.date_range(end=dt_upper, periods=3, freq='MS')
+        dt_lower = three_months[0]
+        overall_range = df[(df['dates_dt']>= dt_lower) & (df['dates_dt']<= dt_upper)]
+
+    elif range_choice == "six_months":
+    # Last six months
+        six_months = pd.date_range(end=dt_upper, periods=6, freq='MS')
+        dt_lower = six_months[0]
+        overall_range = df[(df['dates_dt']>= dt_lower) & (df['dates_dt']<= dt_upper)]
+    elif range_choice == "all_time": 
+        overall_range = df 
+
+    return overall_range
+
+
+
+def date_radio(plot_name): 
+    """
+        Generate the RadioItem object for plots
+    """
+    id_dict= {'confirmed': 'cases-radio',
+            'deaths': 'deaths-radio',
+            'tested': 'tested-radio',
+            'hosp': 'hosp-radio',
+            'state_cases': 'states-cases-radio', 
+            'state_deaths':'states-deaths-radio',
+            'county_cases':'county-cases-radio', 
+            'county_deaths':'county-deaths-radio'}
+
+    radio_btn =  dbc.Container(
+        [
+            
+            dbc.RadioItems(options=[{'label': "Last Week", 'value': 'week'}, 
+                  {'label': "Last month", 'value': 'month'},
+                  {'label': "Three months", 'value': 'three_months'},
+                  {'label': "Six months", 'value': 'six_months'},
+                  {'label': "All time", 'value': 'all_time'}], 
+                
+                labelClassName="date-group-labels-v2",
+                labelCheckedClassName="date-group-labels-checked-v2",
+                className="date-group-items",
+                inline=True,
+                value='week', 
+                id=id_dict[plot_name], 
+            ),
+        
+        ],
+        className="p-3", id='fpage-radio-div'
+    )
+
+
+    return radio_btn
+
+    
+
+
+def confirmed_tabs(): 
+    confirmed_div = html.Div([
+                dcc.Tabs(id='confirmed_tabs',
+                        value='tab-1',
+                        children=[
+                                
+                                    dcc.Tab(label='Per-day', value='tab-1', style=tab_style, selected_style=tab_selected_style),
+                                    dcc.Tab(label='Cumulative', value='tab-2', style=tab_style, selected_style=tab_selected_style),
+                                ]),
+                        
+                dcc.Graph(id='pl1'),
+                ],
+                className=" plot ")
+
+    return confirmed_div
+
+
+
+def deaths_tabs():
+    deaths_div = html.Div([
+                            dcc.Tabs(id='deaths_tabs',
+                                    value='tab-1',
+                                    children=[
+                                        dcc.Tab(label='Per-day', value='tab-1', style=tab_style, selected_style=tab_selected_style),
+                                        dcc.Tab(label='Cumulative', value='tab-2', style=tab_style, selected_style=tab_selected_style),
+                                    ]),
+                            dcc.Graph(id='pl2')
+                    
+                    ],
+                    className=" plot"),
+
+    return deaths_div
+
+
+
+def tested_tabs(): 
+
+    tested_div = html.Div([dcc.Tabs(id='tested_tabs',
+                     value='tab-1',
+                     children=[
+                        dcc.Tab(label='Per-day', value='tab-1', style=tab_style, selected_style=tab_selected_style),
+                        dcc.Tab(label='Cumulative', value='tab-2', style=tab_style, selected_style=tab_selected_style),
+                        ]),
+            
+            dcc.Graph(id='pl_tested'),
+            ],
+           className="plot")
+
+
+    return tested_div
+
+
+def hosp_tabs():
+    hosp_div = html.Div([
+    dcc.Tabs(id='hospitalized_tabs',
+             value='tab-1',
+             children=[
+                        dcc.Tab(label='Per-day', value='tab-1', style=tab_style, selected_style=tab_selected_style),
+                        dcc.Tab(label='Cumulative', value='tab-2', style=tab_style, selected_style=tab_selected_style),
+                    ]),
+    dcc.Graph(id='pl_hospitalized')
+    ],
+     className="plot")
+
+
+
+    return hosp_div

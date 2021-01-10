@@ -104,7 +104,9 @@ covid_layout = html.Div([
                                 ),
 
                         html.Div([
-                            html.Div([
+                            
+                            html.Div([      
+                                          
                                             html.Div(id="cases-count"),
                                             html.Div(id="cases-increase")
                             
@@ -149,56 +151,68 @@ covid_layout = html.Div([
 
     ## Daily number of cases and deaths plot
     # Daily number of cases plot
+    
     html.Div([
-        html.Div([
-            dcc.Tabs(id='confirmed_tabs',
-                     value='tab-1',
-                     children=[
-                        dcc.Tab(label='Per-day', value='tab-1', style=tab_style, selected_style=tab_selected_style),
-                        dcc.Tab(label='Cumulative', value='tab-2', style=tab_style, selected_style=tab_selected_style),
-                        ]),
+            dbc.Row(
+                [
+                dbc.Col(
+                        html.Div([ut.date_radio('confirmed')], id='cases-radio-div'),
+                ), 
+                dbc.Col(            
+                        html.Div([ut.date_radio('deaths')], id='deaths-radio-div'),    
+                    ), 
+                ],
+            justify='start'),
+            dbc.Row(
+                [
+                    dbc.Col( 
+                              ut.confirmed_tabs(), 
+                         width={"size": 5, "order":1}),
+
+
+                dbc.Col(
+                        ut.deaths_tabs(),
+                     width={"size": 5, "order":2, "offset":1},)
+
+                ], justify='center')     
             
-         dcc.Graph(id='pl1'),
-            ],
-           className="six columns plot os-tab"),
-    # Daily number of deaths plot
-    html.Div([
-    dcc.Tabs(id='deaths_tabs',
-             value='tab-1',
-             children=[
-                        dcc.Tab(label='Per-day', value='tab-1', style=tab_style, selected_style=tab_selected_style),
-                        dcc.Tab(label='Cumulative', value='tab-2', style=tab_style, selected_style=tab_selected_style),
-                    ]),
-    dcc.Graph(id='pl2')
-    ],
-     className="six columns plot"),
-    ],className="cases-deaths-row "), 
+    ]), 
+
+        
+
    ## Daily number of tested and hospitalized plot
    # Daily number of Tested plot 
+    
     html.Div([
-        html.Div([
-            dcc.Tabs(id='tested_tabs',
-                     value='tab-1',
-                     children=[
-                        dcc.Tab(label='Per-day', value='tab-1', style=tab_style, selected_style=tab_selected_style),
-                        dcc.Tab(label='Cumulative', value='tab-2', style=tab_style, selected_style=tab_selected_style),
-                        ]),
+            dbc.Row(
+                [
+                dbc.Col(
+                        html.Div([ut.date_radio('tested')], id='tested-radio-div'),
+                ), 
+                dbc.Col(            
+                        html.Div([ut.date_radio('hosp')], id='hosp-radio-div'),    
+                    ), 
+                ],
+            justify='start'),
+            dbc.Row(
+                [
+                    dbc.Col( 
+                                ut.tested_tabs(), 
+                         width={"size": 5, "order":1},),
+
+
+                    dbc.Col(
+                                ut.hosp_tabs(),
+                     width={"size": 5, "order":2, "offset":1},)
+
+                ], justify='center')     
             
-         dcc.Graph(id='pl_tested'),
-            ],
-           className="six columns plot"),
-    # Daily number of hospitalized plot
-    html.Div([
-    dcc.Tabs(id='hospitalized_tabs',
-             value='tab-1',
-             children=[
-                        dcc.Tab(label='Per-day', value='tab-1', style=tab_style, selected_style=tab_selected_style),
-                        dcc.Tab(label='Cumulative', value='tab-2', style=tab_style, selected_style=tab_selected_style),
-                    ]),
-    dcc.Graph(id='pl_hospitalized')
-    ],
-     className="six columns plot"),
-    ],className="tested-hospitalized-row"),
+    ]), 
+
+        
+
+        
+
     
     html.Br(),
     html.Div([ut.footer_text()], style={'display':'inline-block'})
@@ -263,36 +277,95 @@ covid_layout_2  = html.Div([
                          style={'display': 'block', 'width': '50%', 'margin-left': '10%','margin-right': 'auto'}),
     
    
-    html.Div([dcc.Graph(id="main-choro")],
+   
+
+
+    ## State cases and Deaths plots 
+    html.Div([
+        dbc.Row(
+            [
+            html.Div([dcc.Graph(id="main-choro")],
                         style={'width': '90%',
                                 'display': 'inline'}, 
                                 className="six columns plot"),  
-    html.Div([
-    # Small plot 1
-    html.Div([dcc.Graph(id="pl3")], className="six columns plot"),  
-    # Small plot 2 
-    html.Div([dcc.Graph(id="pl4" )], className="six columns plot"),  
-    ], className="state-row"),
-    html.Div([html.H4("Click on a state get a county level map")], 
-                         style={'display': 'block', 'width': '50%', 'margin-left': '10%','margin-right': 'auto'}),
+            ]), 
+        dbc.Row(
+                [
+                dbc.Col(
+                        html.Div([ut.date_radio('state_cases')], id='scases-radio-div'),
+                ), 
+                dbc.Col(            
+                        html.Div([ut.date_radio('state_deaths')], id='sdeaths-radio-div'),    
+                    ), 
+                ],
+             justify='start'),
 
-    html.Div([dcc.Graph(id="state-choro", figure=ut.counties_textbox())],
+     dbc.Row(
+                [
+                    dbc.Col( 
+                            html.Div([dcc.Graph(id="pl3")], className='plot'),
+                          width={"size": 5, "order":1}),
+
+
+                    dbc.Col(
+                           html.Div( dcc.Graph(id="pl4"), className='plot'),
+                    width={"size": 5, "order":2, "offset":1} )
+
+                ], justify="center")     
+
+    ]),
+    
+    
+     
+html.Div([
+
+        dbc.Row([html.Div([html.H4("Click on a state get a county level map")], 
+                         style={'display': 'block', 'width': '50%', 'margin-left': '10%','margin-right': 'auto'}),
+                ]), 
+
+
+        dbc.Row(
+            [
+            html.Div([dcc.Graph(id="state-choro", figure=ut.counties_textbox())],
                         style={'width': '90%',
                                 'display': 'inline'}, 
                                 className="six columns plot colorbar-plot"),
-    
-    html.Div([html.H4("Click on a county to get plots about number of infections and deaths per day ")], 
+            ], justify='center'), 
+        dbc.Row([ html.Div([html.H4("Click on a county to get plots about number of infections and deaths per day ")], 
                          style={'display': 'block', 'width': '50%', 'margin-left': '10%','margin-right': 'auto'}),
+                ]), 
 
-    html.Div([
-        html.Div([dcc.Graph(id='county-cases', 
+        
+        dbc.Row(
+                [
+                dbc.Col(
+                        html.Div([ut.date_radio('county_cases')], id='scases-radio-div'),
+                ), 
+                dbc.Col(            
+                        html.Div([ut.date_radio('county_deaths')], id='sdeaths-radio-div'),    
+                    ), 
+                ],
+             justify='start'),
+
+     dbc.Row(
+                [
+                    dbc.Col( 
+                            html.Div([dcc.Graph(id='county-cases', 
                             figure=ut.counties_cases_textbox())],
-                 className='county-cases six columns plot'), 
-        html.Div([dcc.Graph(id='county-deaths',
-                            figure=ut.counties_deaths_textbox())],
-                 className='county-deaths six columns plot')
+                 className='county-cases plot'),
+                          width={"size": 5, "order":1}),
 
-    ], className='county-plots-row')
+
+                    dbc.Col(
+                         html.Div([dcc.Graph(id='county-deaths',
+                            figure=ut.counties_deaths_textbox())],
+                 className='county-deaths plot'),
+                    width={"size": 5, "order":2, "offset":1} )
+
+                ], justify="center")     
+
+    ]),
+
 ])
 
 

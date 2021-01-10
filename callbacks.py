@@ -83,9 +83,14 @@ def update_summary_metrics(n):
 
 
 @app.callback(Output('pl1', 'figure'),
-              [Input('confirmed_tabs', 'value')] )
-def render_confirmed(tab):
+              [Input('confirmed_tabs', 'value'), 
+               Input('cases-radio', 'value')])
+def render_confirmed(tab, date_choice):
+    
     overall_us_df = pd.read_csv(config['overall_loc'])
+    overall_us_df['dates_dt'] = pd.to_datetime(overall_us_df['date'], format='%Y%m%d')
+    overall_us_df = utils.date_filter(overall_us_df, date_choice)
+    
     if tab == 'tab-1':
         dc_fig = px.bar(overall_us_df, 
                         x='dates_dt', 
@@ -93,8 +98,8 @@ def render_confirmed(tab):
                         labels={"positiveIncrease":"Total Number of new cases",
                                 "dates_dt" : "Time"},
                         title='New cases per day for US')
-        dc_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
-        dc_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
+        dc_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
+        dc_fig.update_yaxes(showgrid=False, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
 
         dc_fig.update_layout(dict(paper_bgcolor=config['paper_color'],
                                          plot_bgcolor=config['plot_color'],
@@ -110,7 +115,7 @@ def render_confirmed(tab):
                         title='New cases per day for US')
         dc_fig.update_xaxes(nticks=20)
         dc_fig.update_traces(marker_color=config['bar_color'],
-                             marker_line_color=config['marker_line_color'])                            
+                             marker_line_color=config['marker_line_color'], marker_size=config['marker_size'])                            
         dc_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
         dc_fig.update_yaxes(showgrid=True, gridcolor='grey', mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3, zeroline= True)
 
@@ -121,12 +126,14 @@ def render_confirmed(tab):
 
     
 @app.callback(Output('pl2', 'figure'),
-              [Input('deaths_tabs', 'value')] 
+              [Input('deaths_tabs', 'value'), 
+               Input('deaths-radio', 'value')] 
               )
-def render_deaths(tab):
+def render_deaths(tab, date_choice):
     
     overall_us_df = pd.read_csv(config['overall_loc'])
-
+    overall_us_df['dates_dt'] = pd.to_datetime(overall_us_df['date'], format='%Y%m%d')
+    overall_us_df = utils.date_filter(overall_us_df, date_choice)
     if tab == 'tab-1':
         dc_fig = px.bar(overall_us_df, 
                         x='dates_dt', 
@@ -139,8 +146,8 @@ def render_deaths(tab):
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
         dc_fig.update_traces(marker_color=config['bar_color'], marker_line_color=config['marker_line_color'])                            
-        dc_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
-        dc_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
+        dc_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
+        dc_fig.update_yaxes(showgrid=False, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
 
         return dc_fig
     elif tab == 'tab-2':
@@ -154,7 +161,7 @@ def render_deaths(tab):
         dc_fig.update_layout(dict(paper_bgcolor=config['paper_color'],
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
-        dc_fig.update_traces(marker_color=config['bar_color'], marker_line_color=config['marker_line_color'])                            
+        dc_fig.update_traces(marker_color=config['bar_color'], marker_line_color=config['marker_line_color'], marker_size=config['marker_size'] )                            
         dc_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
         dc_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
 
@@ -162,9 +169,12 @@ def render_deaths(tab):
    
 
 @app.callback(Output('pl_tested', 'figure'),
-              [Input('tested_tabs', 'value')])
-def render_tested(tab):
+              [Input('tested_tabs', 'value'),
+               Input('tested-radio','value')])
+def render_tested(tab, date_choice):
     overall_us_df = pd.read_csv(config['overall_loc'])
+    overall_us_df['dates_dt'] = pd.to_datetime(overall_us_df['date'], format='%Y%m%d')
+    overall_us_df = utils.date_filter(overall_us_df, date_choice)
     if tab == 'tab-1':
         tested_fig = px.bar(overall_us_df, 
                             x='dates_dt', 
@@ -177,8 +187,8 @@ def render_tested(tab):
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
         tested_fig.update_traces(marker_color=config['bar_color'], marker_line_color=config['marker_line_color'])                            
-        tested_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
-        tested_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1,linecolor='grey', linewidth=3,  zeroline= True)
+        tested_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
+        tested_fig.update_yaxes(showgrid=False, gridcolor='grey',  mirror=True, gridwidth=0.1,linecolor='grey', linewidth=3,  zeroline= True)
 
         return tested_fig
     elif tab == 'tab-2':
@@ -192,7 +202,7 @@ def render_tested(tab):
         tested_fig.update_layout(dict(paper_bgcolor=config['paper_color'],
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
-        tested_fig.update_traces(marker_color=config['bar_color'], marker_line_color=config['marker_line_color'])                            
+        tested_fig.update_traces(marker_color=config['bar_color'], marker_line_color=config['marker_line_color'], marker_size=config['marker_size'])                            
         tested_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1,linecolor='grey', linewidth=3,  zeroline= True)
         tested_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
                                  
@@ -200,9 +210,12 @@ def render_tested(tab):
 
     
 @app.callback(Output('pl_hospitalized', 'figure'),
-              [Input('hospitalized_tabs', 'value')])
-def render_content(tab):
+              [Input('hospitalized_tabs', 'value'),
+              Input('hosp-radio','value')])
+def render_content(tab, date_choice):
     overall_us_df = pd.read_csv(config['overall_loc'])
+    overall_us_df['dates_dt'] = pd.to_datetime(overall_us_df['date'], format='%Y%m%d')
+    overall_us_df = utils.date_filter(overall_us_df, date_choice)
     if tab == 'tab-1':
         hosp_fig = px.bar(overall_us_df,
                          x='dates_dt', 
@@ -215,8 +228,8 @@ def render_content(tab):
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
         hosp_fig.update_traces(marker_color=config['bar_color'], marker_line_color=config['marker_line_color'])                            
-        hosp_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
-        hosp_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
+        hosp_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
+        hosp_fig.update_yaxes(showgrid=False, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
                                  
         return hosp_fig
 
@@ -231,7 +244,7 @@ def render_content(tab):
         hosp_fig.update_layout(dict(paper_bgcolor=config['paper_color'],
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
-        hosp_fig.update_traces(marker_color=config['bar_color'], marker_line_color=config['marker_line_color'])                            
+        hosp_fig.update_traces(marker_color=config['bar_color'], marker_line_color=config['marker_line_color'], marker_size=config['marker_size'])                            
         hosp_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
         hosp_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
                  
@@ -284,11 +297,15 @@ def us_choropleth(n_intervals, radio_choice):
 
 # Display states cases plot
 @app.callback(Output('pl3', 'figure'),
-             [Input('main-choro','clickData')])
-def display_states_cases(clickData):
+             [Input('main-choro','clickData'),
+             Input('states-cases-radio','value')])
+def display_states_cases(clickData, date_choice):
     
     # Get states historic data 
     states_historic_df = pd.read_csv(config['historic_loc'])
+    states_historic_df['dates_dt'] = pd.to_datetime(states_historic_df['date'], format='%Y%m%d')
+    states_historic_df = utils.date_filter(states_historic_df, date_choice)
+
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     
     # Show the California plot as the default plot if there is no click is recorded on the US map
@@ -306,8 +323,8 @@ def display_states_cases(clickData):
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
         confirmed_fig.update_traces(marker_color=config['bar_color'],  marker_line_color=config['marker_line_color'])                            
-        confirmed_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
-        confirmed_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
+        confirmed_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
+        confirmed_fig.update_yaxes(showgrid=False, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
         
         state_fig = confirmed_fig 
     else: 
@@ -327,8 +344,8 @@ def display_states_cases(clickData):
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
         state_fig.update_traces(marker_color=config['bar_color'],  marker_line_color=config['marker_line_color'])                            
-        state_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
-        state_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
+        state_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
+        state_fig.update_yaxes(showgrid=False, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
                   
     return state_fig
 
@@ -336,10 +353,14 @@ def display_states_cases(clickData):
 
 # Display State Deaths plot
 @app.callback(Output('pl4', 'figure'),
-             [Input('main-choro','clickData')])
-def display_state_deaths(clickData):
+             [Input('main-choro','clickData'), 
+             Input('states-deaths-radio','value')])
+def display_state_deaths(clickData, date_choice):
      # Get states historic data 
     states_historic_df = pd.read_csv(config['historic_loc'])
+    states_historic_df['dates_dt'] = pd.to_datetime(states_historic_df['date'], format='%Y%m%d')
+    states_historic_df = utils.date_filter(states_historic_df, date_choice)
+
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     
     # Show the California plot as the default plot if there is no click is recorded on the US map
@@ -357,12 +378,15 @@ def display_state_deaths(clickData):
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
         deaths_fig.update_traces(marker_color=config['bar_color'],  marker_line_color=config['marker_line_color'])                            
-        deaths_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
-        deaths_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
+        deaths_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
+        deaths_fig.update_yaxes(showgrid=False, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
             
         state_fig = deaths_fig
     else: 
         states_historic_df = pd.read_csv(config['historic_loc'])
+        states_historic_df['dates_dt'] = pd.to_datetime(states_historic_df['date'], format='%Y%m%d')
+        states_historic_df = utils.date_filter(states_historic_df, date_choice)
+
         single_state = clickData['points'][0]['location']
         perday_state = states_historic_df[states_historic_df['state'] == single_state]
         title = "Death counts for {}".format(str(us.states.lookup(single_state)))
@@ -396,12 +420,14 @@ def state_choro(clickData):
 # County level cases count plot
 @app.callback(Output('county-cases', 'figure'),
               [Input('state-choro', 'clickData'),
-              Input('main-choro','clickData')])
-def county_cases(county_click, state_click): 
+              Input('main-choro','clickData'), 
+              Input('county-cases-radio', 'value')])
+def county_cases(county_click, state_click, date_choice): 
 
     single_state = state_click['points'][0]['location']
     single_county = county_click['points'][0]['location']
-    county_cum_cases, county_day_cases = utils.county_cases_deaths(single_county, single_state, cases=True)    
+    county_cum_cases, county_day_cases = utils.county_cases_deaths(single_county, single_state, cases=True) 
+    county_day_cases = utils.date_filter(county_day_cases, date_choice)
     figure = utils.plot_county_data(county_day_cases, single_county, single_state, cases=True, cumulative=False)
     
     return figure
@@ -410,12 +436,14 @@ def county_cases(county_click, state_click):
 # County level cases count plot
 @app.callback(Output('county-deaths', 'figure'),
               [Input('state-choro', 'clickData'),
-              Input('main-choro','clickData')])
-def county_cases(county_click, state_click): 
+              Input('main-choro','clickData'), 
+              Input('county-deaths-radio', 'value')])
+def county_deaths(county_click, state_click, date_choice): 
     if state_click['points'] and county_click['points']: 
         single_state = state_click['points'][0]['location']
         single_county = county_click['points'][0]['location']
         county_cum_cases, county_day_cases = utils.county_cases_deaths(single_county, single_state, cases=False)
+        county_day_cases = utils.date_filter(county_day_cases, date_choice)
         figure = utils.plot_county_data(county_day_cases, single_county, single_state, cases=False, cumulative=False)
     return figure
 
