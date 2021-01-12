@@ -241,9 +241,9 @@ def choropleth_state(state_name):
     return fig
 
 
-def choropleth_state_v2(state_name):
-    full_state = str(us.states.lookup(state_name))
+def counties_per_state(state_name):
 
+    full_state = str(us.states.lookup(state_name))
     counties_df = pd.read_csv(config['counties_data'])    
     counties_df = counties_df.drop(columns=[counties_df.columns[0]])   
     covid_df = counties_df[['NAME',counties_df.columns[-1]]]
@@ -258,7 +258,11 @@ def choropleth_state_v2(state_name):
     df['id'] =  df['COUNTY'].astype(str) + '-' + df['NAME'].astype(str)
     df = df.set_index('id')
     df = df.rename(columns={df.columns[-1]:'covid_values'})
+    return df, states_centers
 
+
+def choropleth_state_v2(df, states_centers, state_name):
+    
     lat_lon = states_centers[states_centers['Abbr'] == state_name][['lat', 'lon']]
 
     center_dict = {'lat': lat_lon['lat'].values[0],'lon': lat_lon['lon'].values[0] }
@@ -570,3 +574,46 @@ def hosp_tabs():
 
 
     return hosp_div
+
+
+
+def states_dropdown(): 
+
+    state_centers_df = pd.read_csv("data/states_centers.csv", delimiter='\t', names=['lat','long', 'states'])
+    states_array = state_centers_df['states'].values
+    options =[]
+    for state in states_array: 
+        single_option = {'label': state, 'value': state}
+        options.append(single_option)
+
+
+    states_dropdown = dcc.Dropdown(
+    options=options,
+    id='states-dropdown',
+    value='California', 
+    className="s-dropdown"
+        )
+
+    return states_dropdown
+
+
+
+
+
+def counties_dropdown(counties_df): 
+
+    counties_list = counties_df.index.value_counts().index.tolist()
+    options =[]
+    for county in counties_list: 
+        single_option = {'label': county.split("-")[1], 'value': county}
+        options.append(single_option)
+
+
+    counties_dropdown = dcc.Dropdown(
+    options=options,
+    id='counties-dropdown',
+    value='None', 
+    className="s-dropdown"
+        )
+
+    return counties_dropdown

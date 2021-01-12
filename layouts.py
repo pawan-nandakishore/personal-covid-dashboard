@@ -246,9 +246,9 @@ covid_layout_2  = html.Div([
     html.Div(ut.page2_below_title()), 
     
     html.Br(),
-
+   
     html.Div(dbc.Row(
-    
+     
     dbc.Container(
     [
         
@@ -282,6 +282,11 @@ covid_layout_2  = html.Div([
 
     ## State cases and Deaths plots 
     html.Div([
+        dbc.Row([
+            dbc.Col(html.H6("Choose a State:"), width={"size":1, "order":1, "offset":1}, xs=1, align='end'),
+            dbc.Col(ut.states_dropdown(), width={"size":3, "order":2}, lg=3 , align='start')     
+        ], justify='center'),
+
         dbc.Row(
             [
             html.Div([dcc.Graph(id="main-choro")],
@@ -314,16 +319,22 @@ covid_layout_2  = html.Div([
                 ], justify="center")     
 
     ]),
-    
-    
-     
+    html.Br(),
+    html.Br(),
+    # width={"size":3, "order":1, "offset":0}  width={"size":1, "order":2}
+# Layout for county level choropleth and the accompanying figures  
 html.Div([
 
         dbc.Row([html.Div([html.H4("Click on a state get a county level map")], 
                          style={'display': 'block', 'width': '50%', 'margin-left': '10%','margin-right': 'auto'}),
                 ]), 
+        html.Br(),
+        html.Br(), 
+        dbc.Row( [ 
+            
+            dbc.Col(html.H6("Choose a County:"), width={"size":1, "order":1, "offset":1}, xs=1, align='end'),
 
-
+            dbc.Col(html.Div(id='counties-dropdown-div'), width={"size":3, "order":2}, lg=3 , align='start')], justify='center'), 
         dbc.Row(
             [
             html.Div([dcc.Graph(id="state-choro", figure=ut.counties_textbox())],
@@ -346,6 +357,7 @@ html.Div([
                     ), 
                 ],
              justify='start'),
+
 
      dbc.Row(
                 [

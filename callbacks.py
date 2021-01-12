@@ -298,8 +298,9 @@ def us_choropleth(n_intervals, radio_choice):
 # Display states cases plot
 @app.callback(Output('pl3', 'figure'),
              [Input('main-choro','clickData'),
-             Input('states-cases-radio','value')])
-def display_states_cases(clickData, date_choice):
+             Input('states-cases-radio','value'), 
+             Input('states-dropdown', 'value')])
+def display_states_cases(clickData, date_choice, state_dropdown):
     
     # Get states historic data 
     states_historic_df = pd.read_csv(config['historic_loc'])
@@ -307,9 +308,9 @@ def display_states_cases(clickData, date_choice):
     states_historic_df = utils.date_filter(states_historic_df, date_choice)
 
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
-    
+   
     # Show the California plot as the default plot if there is no click is recorded on the US map
-    if 'clickData' not in changed_id: 
+    if 'main-choro.clickData' not in changed_id and 'states-dropdown.value' not in changed_id :
         perday_state = states_historic_df[states_historic_df['state'] == 'CA']
         confirmed_fig = px.bar(perday_state,
                                 x='dates_dt',
@@ -328,8 +329,11 @@ def display_states_cases(clickData, date_choice):
         
         state_fig = confirmed_fig 
     else: 
-     
-        single_state = clickData['points'][0]['location']
+        if 'main-choro.clickData' not in changed_id: 
+            single_state = us.states.lookup(state_dropdown).abbr
+        else:
+            single_state = clickData['points'][0]['location']
+        
         perday_state = states_historic_df[states_historic_df['state'] == single_state]
         title = "Number of infections per day for {}".format(str(us.states.lookup(single_state)))
         state_fig = px.bar(perday_state, 
@@ -346,7 +350,9 @@ def display_states_cases(clickData, date_choice):
         state_fig.update_traces(marker_color=config['bar_color'],  marker_line_color=config['marker_line_color'])                            
         state_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
         state_fig.update_yaxes(showgrid=False, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
-                  
+
+    
+
     return state_fig
 
 
@@ -354,17 +360,17 @@ def display_states_cases(clickData, date_choice):
 # Display State Deaths plot
 @app.callback(Output('pl4', 'figure'),
              [Input('main-choro','clickData'), 
-             Input('states-deaths-radio','value')])
-def display_state_deaths(clickData, date_choice):
+             Input('states-deaths-radio','value'), 
+             Input('states-dropdown', 'value')])
+def display_state_deaths(clickData, date_choice, state_dropdown):
      # Get states historic data 
     states_historic_df = pd.read_csv(config['historic_loc'])
     states_historic_df['dates_dt'] = pd.to_datetime(states_historic_df['date'], format='%Y%m%d')
     states_historic_df = utils.date_filter(states_historic_df, date_choice)
 
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
-    
     # Show the California plot as the default plot if there is no click is recorded on the US map
-    if 'clickData' not in changed_id: 
+    if 'main-choro.clickData' not in changed_id and 'states-dropdown.value' not in changed_id :
         perday_state = states_historic_df[states_historic_df['state'] == 'CA']
         title = "Daily Death counts for {}".format("California")
         deaths_fig = px.bar(perday_state,
@@ -383,11 +389,15 @@ def display_state_deaths(clickData, date_choice):
             
         state_fig = deaths_fig
     else: 
+        if 'main-choro.clickData' not in changed_id: 
+            single_state = us.states.lookup(state_dropdown).abbr
+        else:
+            single_state = clickData['points'][0]['location']
+        
         states_historic_df = pd.read_csv(config['historic_loc'])
         states_historic_df['dates_dt'] = pd.to_datetime(states_historic_df['date'], format='%Y%m%d')
         states_historic_df = utils.date_filter(states_historic_df, date_choice)
 
-        single_state = clickData['points'][0]['location']
         perday_state = states_historic_df[states_historic_df['state'] == single_state]
         title = "Death counts for {}".format(str(us.states.lookup(single_state)))
         state_fig = px.bar(perday_state, 
@@ -401,31 +411,38 @@ def display_state_deaths(clickData, date_choice):
                                          plot_bgcolor=config['plot_color'],
                                          font_color="white" ))
         state_fig.update_traces(marker_color=config['bar_color'],  marker_line_color=config['marker_line_color'])                            
-        state_fig.update_xaxes(nticks=20, showgrid=True, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
-        state_fig.update_yaxes(showgrid=True, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
+        state_fig.update_xaxes(nticks=20, showgrid=False, gridcolor='grey', mirror=True, gridwidth=1, linecolor='grey', linewidth=3,  zeroline= True)
+        state_fig.update_yaxes(showgrid=False, gridcolor='grey',  mirror=True, gridwidth=0.1, linecolor='grey', linewidth=3,  zeroline= True)
                 
     return state_fig
 
 # County level Choropleth 
-@app.callback(Output('state-choro', 'figure'),
+@app.callback([Output('counties-dropdown-div', 'children'),
+               Output('state-choro', 'figure')],
               [Input('main-choro','clickData')])
 def state_choro(clickData): 
     single_state = clickData['points'][0]['location']
-    start_time = time.time()
-    figure = utils.choropleth_state_v2(single_state)
-    end_time = time.time()
-    return figure
+    counties_df, state_centers = utils.counties_per_state(single_state)
+    children =  [utils.counties_dropdown(counties_df)]  
+    figure = utils.choropleth_state_v2(counties_df, state_centers, single_state)
+
+    return children, figure
 
 
 # County level cases count plot
 @app.callback(Output('county-cases', 'figure'),
               [Input('state-choro', 'clickData'),
               Input('main-choro','clickData'), 
-              Input('county-cases-radio', 'value')])
-def county_cases(county_click, state_click, date_choice): 
-
+              Input('county-cases-radio', 'value'), 
+              Input('counties-dropdown', 'value')])
+def county_cases(county_click, state_click, date_choice, county_dropdown): 
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    if 'counties-dropdown.value' in changed_id:
+        single_county = county_dropdown
+    else: 
+        single_county = county_click['points'][0]['location']
+    
     single_state = state_click['points'][0]['location']
-    single_county = county_click['points'][0]['location']
     county_cum_cases, county_day_cases = utils.county_cases_deaths(single_county, single_state, cases=True) 
     county_day_cases = utils.date_filter(county_day_cases, date_choice)
     figure = utils.plot_county_data(county_day_cases, single_county, single_state, cases=True, cumulative=False)
@@ -437,11 +454,17 @@ def county_cases(county_click, state_click, date_choice):
 @app.callback(Output('county-deaths', 'figure'),
               [Input('state-choro', 'clickData'),
               Input('main-choro','clickData'), 
-              Input('county-deaths-radio', 'value')])
-def county_deaths(county_click, state_click, date_choice): 
-    if state_click['points'] and county_click['points']: 
-        single_state = state_click['points'][0]['location']
+              Input('county-deaths-radio', 'value'), 
+              Input('counties-dropdown', 'value')])
+def county_deaths(county_click, state_click, date_choice, county_dropdown): 
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    if 'counties-dropdown.value' in changed_id:
+        single_county = county_dropdown
+    else: 
         single_county = county_click['points'][0]['location']
+    
+    if state_click['points']: 
+        single_state = state_click['points'][0]['location']
         county_cum_cases, county_day_cases = utils.county_cases_deaths(single_county, single_state, cases=False)
         county_day_cases = utils.date_filter(county_day_cases, date_choice)
         figure = utils.plot_county_data(county_day_cases, single_county, single_state, cases=False, cumulative=False)
